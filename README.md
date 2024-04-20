@@ -50,3 +50,10 @@ classDiagram
     MeetingRoom "0..*" -- "0..*" Reservation : has
 
 ```
+
+Neste diagrama, temos as seguintes classes:
+
+- **Room**: Representa uma sala genérica, com sua capacidade e recursos disponíveis.
+- **Resource**: Representa um recurso que pode estar presente em uma sala de reunião, como um projetor, quadro branco, etc.
+- **MeetingRoom**: Uma subclasse de Room, representa uma sala de reunião específica com suas reservas.
+- **Reservation**: Representa uma reserva de uma sala de reunião, incluindo informações como sala reservada, horário, organizador e propósito da reunião.
