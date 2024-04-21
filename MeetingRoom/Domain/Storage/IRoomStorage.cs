@@ -7,5 +7,6 @@ namespace MeetingRoom.Domain.Storage
         Room Create(Room room);
         void DeleteAll();
         IList<Room> GetAll();
+        Room GetById(int roomId);
     }
 }

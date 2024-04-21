@@ -27,5 +27,10 @@ namespace MeetingRoom.Infra
         {
             return storage.GetAll();
         }
+
+        public Room GetById(int roomId)
+        {
+            return storage.GetById(roomId);
+        }
     }
 }

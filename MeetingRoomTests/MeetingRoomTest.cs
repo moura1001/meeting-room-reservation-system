@@ -10,10 +10,14 @@ namespace MeetingRoomTests;
 public class MeetingRoomTest : IAsyncLifetime, IDisposable
 {
     private readonly IRoomService roomService;
+    private readonly IReservationService reservationService;
 
     public MeetingRoomTest() {
         IRoomStorage storage = new RoomStorageInMemory();
         roomService = new RoomService(storage);
+        
+        IReservationStorage reservationStorage = new ReservationStorageInMemory();
+        reservationService = new ReservationService(reservationStorage, roomService);
     }
 
     // Before Each
@@ -53,5 +57,34 @@ public class MeetingRoomTest : IAsyncLifetime, IDisposable
         Assert.True(rooms.Where(room => room.RoomId == 1 && room.Resources.Count == 1).Any());
         Assert.True(rooms.Where(room => room.RoomId == 2 && room.Resources.Count == 2).Any());
         Assert.True(rooms.Where(room => room.RoomId == 3 && room.Resources.Count == 3).Any());
+    }
+
+    [Fact]
+    public void DeveriaReservarUmaSalaDeReuniaoComSucesso()
+    {
+        var startTime = DateTime.Now.AddDays(5);
+        var endTime = startTime.AddHours(2);
+        var organizer = "Random Organizer";
+        var purpose = "Random Purpose";
+        reservationService.BookMeetingRoom(1, new Model.Reservation(startTime, endTime, organizer, purpose));
+
+        IList<Model.Reservation> reservations = reservationService.GetAll();
+        Assert.NotEmpty(reservations);
+        Assert.Equal(1, reservations.Count);
+        Assert.Equal("Meeting Room 1", reservations.ElementAt(0).MeetingRoom.Name);
+    }
+
+    [Fact]
+    public void DeveriaLancarExcecaoAoTentarReservarUmaSalaQueNaoExiste()
+    {
+        var startTime = DateTime.Now.AddDays(5);
+        var endTime = startTime.AddHours(2);
+        var organizer = "Random Organizer";
+        var purpose = "Random Purpose";
+        
+        Exception throws = Assert.Throws<Exception>(
+	        () => reservationService.BookMeetingRoom(99, new Model.Reservation(startTime, endTime, organizer, purpose))
+        );
+        Assert.Equal("Room 99 does not exist", throws.Message);
     }
 }
