@@ -7,5 +7,6 @@ namespace MeetingRoom.Domain.Storage
         IList<Reservation> GetAll();
         Reservation GetById(int reservationId);
         Reservation Create(Reservation reservation);
+        bool HasReservationsForRoomBeteweenTimes(int roomId, DateTime startTime, DateTime endTime);
     }
 }

@@ -21,6 +21,9 @@ namespace MeetingRoom.Infra
 
             if (room is Model.MeetingRoom meetingRoom)
             {
+                if (storage.HasReservationsForRoomBeteweenTimes(roomId, reservation.StartTime, reservation.EndTime))
+                    throw new Exception("Reservation conflict: Two or more reservations cannot overlap at the same time for the same room");
+
                 reservation.MeetingRoom = meetingRoom;
                 storage.Create(reservation);
             }

@@ -27,5 +27,25 @@ namespace MeetingRoom.Infra.Storage
 
             return reservation;
         }
+
+        public bool HasReservationsForRoomBeteweenTimes(int roomId, DateTime startTime, DateTime endTime)
+        {
+            return reservations.Where(reservation => 
+                reservation.MeetingRoom.RoomId == roomId
+                &&
+                (
+                    IsBeteweenTwoDates(startTime, reservation.StartTime, reservation.EndTime)
+                    ||
+                    IsBeteweenTwoDates(endTime, reservation.StartTime, reservation.EndTime)
+                    ||
+                    (startTime <= reservation.StartTime && endTime >= reservation.EndTime)
+                )
+            ).Any();
+        }
+
+        private bool IsBeteweenTwoDates(DateTime dt, DateTime start, DateTime end)
+        {
+            return dt >= start && dt <= end;
+        }
     }
 }
