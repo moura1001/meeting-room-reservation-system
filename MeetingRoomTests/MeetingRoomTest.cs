@@ -87,4 +87,27 @@ public class MeetingRoomTest : IAsyncLifetime, IDisposable
         );
         Assert.Equal("Room 99 does not exist", throws.Message);
     }
+
+    [Fact]
+    public void DeveriaReservarUmaSalaComSucessoApenasComUmaAntecedenciaMinimaDe24Horas()
+    {
+        var startTime = DateTime.Now.AddHours(23).AddMinutes(59);
+        var endTime = startTime.AddHours(2);
+        var organizer = "Random Organizer";
+        var purpose = "Random Purpose";
+
+        Exception throws = Assert.Throws<Exception>(
+	        () => reservationService.BookMeetingRoom(1, new Model.Reservation(startTime, endTime, organizer, purpose))
+        );
+        Assert.Equal("It is not possible to reserve a room less than 24 hours in advance", throws.Message);
+
+        startTime = DateTime.Now.AddHours(24).AddSeconds(1);
+        endTime = startTime.AddHours(2);
+        reservationService.BookMeetingRoom(1, new Model.Reservation(startTime, endTime, organizer, purpose));
+
+        IList<Model.Reservation> reservations = reservationService.GetAll();
+        Assert.NotEmpty(reservations);
+        Assert.Equal(1, reservations.Count);
+        Assert.Equal("Meeting Room 1", reservations.ElementAt(0).MeetingRoom.Name);
+    }
 }

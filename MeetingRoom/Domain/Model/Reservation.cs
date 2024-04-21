@@ -43,6 +43,9 @@ namespace MeetingRoom.Domain.Model
             get { return startTime; }
 
             set {
+                if (value < DateTime.Now.AddHours(24))
+                    throw new Exception("It is not possible to reserve a room less than 24 hours in advance");
+
                 startTime = value;
             }
         }
