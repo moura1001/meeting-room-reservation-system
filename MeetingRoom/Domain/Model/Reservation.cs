@@ -61,7 +61,7 @@ namespace MeetingRoom.Domain.Model
         public string Organizer {
             get { return organizer; }
 
-            private set {
+            set {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new Exception("Organizer can't be null, empty or consists only of white-space characters");
                 
@@ -72,7 +72,7 @@ namespace MeetingRoom.Domain.Model
         public string Purpose {
             get { return purpose; }
 
-            private set {
+            set {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new Exception("Purpose can't be null, empty or consists only of white-space characters");
                 

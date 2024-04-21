@@ -47,5 +47,37 @@ namespace MeetingRoom.Infra.Storage
         {
             return dt >= start && dt <= end;
         }
+
+        public Reservation UpdateReservation(Reservation updatedReservation)
+        {
+            int index = IndexOf(updatedReservation.ReservationId);
+            if (index < 0)
+                throw new Exception($"Reservation {updatedReservation.ReservationId} does not exist");
+
+            
+            reservations.Insert(index, updatedReservation);
+            reservations.RemoveAt(index);
+            
+            return updatedReservation;
+        }
+
+        private int IndexOf(int reservationId)
+        {
+            int index = -1;
+            for (int i = 0; i < reservations.Count; i++)
+            {
+                if (reservations.ElementAt(i).ReservationId == reservationId)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        public void DeleteAll()
+        {
+            reservations.Clear();
+        }
     }
 }

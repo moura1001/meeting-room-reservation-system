@@ -38,5 +38,38 @@ namespace MeetingRoom.Infra
         {
             return storage.GetById(reservationId);
         }
+
+        public void UpdateReservation(int reservationId, int roomId, Model.Reservation updatedReservation)
+        {
+            var reservation = storage.GetById(reservationId);
+
+            if (reservation.MeetingRoom.RoomId != roomId)
+            {
+                var room = roomService.GetById(roomId);
+
+                if (room is Model.MeetingRoom meetingRoom)
+                {
+                    reservation.MeetingRoom = meetingRoom;
+                }
+            }
+
+            if ((updatedReservation.StartTime != reservation.StartTime || updatedReservation.EndTime != reservation.EndTime)
+                &&
+                storage.HasReservationsForRoomBeteweenTimes(roomId, updatedReservation.StartTime, updatedReservation.EndTime)
+            )
+                throw new Exception("Reservation conflict: Two or more reservations cannot overlap at the same time for the same room");
+            
+            reservation.StartTime = updatedReservation.StartTime;
+            reservation.EndTime = updatedReservation.EndTime;
+            reservation.Organizer = updatedReservation.Organizer;
+            reservation.Purpose = updatedReservation.Purpose;
+
+            storage.UpdateReservation(reservation);
+        }
+
+        public void DeleteAll()
+        {
+            storage.DeleteAll();
+        }
     }
 }

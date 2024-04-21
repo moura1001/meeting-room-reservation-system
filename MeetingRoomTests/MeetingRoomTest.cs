@@ -25,6 +25,7 @@ public class MeetingRoomTest : IAsyncLifetime, IDisposable
     {
         await Task.Run(() => {
             roomService.DeleteAll();
+            reservationService.DeleteAll();
             
             var resource1 = new Model.Resource("Projetor");
             var resource2 = new Model.Resource("Sistema de som");
@@ -158,5 +159,33 @@ public class MeetingRoomTest : IAsyncLifetime, IDisposable
         Assert.Equal(2, reservations.Count);
         Assert.True(reservations.Where(r => r.ReservationId == 1 && string.Equals("Meeting Room 1", r.MeetingRoom.Name)).Any());
         Assert.True(reservations.Where(r => r.ReservationId == 2 && string.Equals("Meeting Room 1", r.MeetingRoom.Name)).Any());
+    }
+
+    [Fact]
+    public void DeveriaEditarReservaComSucesso()
+    {
+        var startTime = DateTime.Now.AddDays(2);
+        var endTime = startTime.AddHours(2);
+        var organizer = "Random Organizer";
+        var purpose = "Random Purpose";
+        reservationService.BookMeetingRoom(1, new Model.Reservation(1, startTime, endTime, organizer, purpose));
+
+        startTime = DateTime.Now.AddDays(2).AddMinutes(-30);
+        endTime = startTime.AddMinutes(15);
+        reservationService.BookMeetingRoom(1, new Model.Reservation(2, startTime, endTime, organizer, purpose));
+
+        reservationService.UpdateReservation(2, 3, new Model.Reservation(startTime, endTime, organizer, "New Random Purpose"));
+
+        IList<Model.Reservation> reservations = reservationService.GetAll();
+        Assert.NotEmpty(reservations);
+        Assert.Equal(2, reservations.Count);
+        Assert.True(reservations.Where(r => r.ReservationId == 1 && string.Equals("Meeting Room 1", r.MeetingRoom.Name)).Any());
+        Assert.True(reservations.Where(r =>
+            r.ReservationId == 2
+            && 
+            string.Equals("Meeting Room 3", r.MeetingRoom.Name)
+            &&
+            string.Equals("New Random Purpose", r.Purpose)
+        ).Any());
     }
 }
